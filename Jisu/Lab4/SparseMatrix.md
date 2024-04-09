@@ -70,3 +70,51 @@ void fastTranspose(term a[], term b[]) {
 0부터 순서대로 줄을 세우면 첫 번째 startingPos[i]는 b에서 i를 row 값으로 갖는 원소가 첫 번째 등장하게 될 index를 나타내게 된다.
 해당 index를 저장하고 나면 startingPos[a[i].col]++를 하기 때문에 그 값이 증가한다.
 
+
+
+### Lab4의 2번 행렬 곱 Sparse Matrix의 특성을 이용한 계산
+기존에는 아래와 같이 곱해서 Sparse Matrix로 나타냈다.
+```c
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+		for (int k = 0; k < n; k++) {
+			c[i][j] += a[i][k] * b[k][j];
+		}
+    }
+}
+
+int k;
+r[0].row = n;
+r[0].col = n;
+r[0].value = 0;
+for (int i = 0; i < n; i++) {
+    for (int j = 0; j < n; j++) {
+        if (c[i][j] != 0) {
+            r[0].value++;
+            r[r[0].value].row = i;
+            r[r[0].value].col = j;
+            r[r[0].value].value = c[i][j];
+        }
+    }
+}
+```
+![image](https://github.com/APPDONG-KNU/2024_1_DataStructure/assets/108786142/15a324b7-07e1-40a9-a617-7a3f2b24d970)
+위의 그림과 같이 계산하면 아래와 같은 방법으로 계산이 가능하다.
+```c
+for (p = 0; p < n; p++)
+    for (q = 0; q < n; q++) {
+        int sum = 0;
+        for (i = 0; i < n; i++)
+            for (j = 1; j <= a[0].value; j++)
+                if (a[j].row == p && a[j].col == i)
+                    for (k = 1; k <= b[0].value; k++)
+                        if (b[k].row == q && b[k].col == i)
+                            sum += a[j].value * b[k].value;
+        if (sum != 0) {
+            r[0].value++;
+            r[r[0].value].row = p;
+            r[r[0].value].col = q;
+            r[r[0].value].value = sum;
+        }
+    }
+```
